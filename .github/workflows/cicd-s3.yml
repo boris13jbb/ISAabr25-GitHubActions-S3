@@ -23,5 +23,5 @@ jobs:
         aws-region: ${{ env.AWS_REGION }}
 
     - name: Deploy to AWS S3
-      run: aws s3 cp ./index.html s3://bucketname
+      run: aws s3 cp ./index.html s3://burbanojuanbucket
  
