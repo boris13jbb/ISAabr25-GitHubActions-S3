@@ -1,27 +1,30 @@
-name: Despliegue de website estatico a AWS S3
+name: Despliegue de website estático a AWS S3
 
 on:
   push:
+    branches: [ main ]  # Recomendado: especificar rama
 
 env:
   AWS_REGION: us-east-1
+  S3_BUCKET: burbanojuanbucket  # Variable para el nombre del bucket
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: $ {{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v2  # Versión más reciente
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}  # Corregido: espacio después de $
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Deploy to AWS S3
-      run: aws s3 cp ./index.html s3://burbanojuanbucket
- 
+      - name: Desplegar archivos a S3
+        run: |
+          aws s3 sync ./ s3://${{ env.S3_BUCKET }} --delete
+          aws s3 cp ./index.html s3://${{ env.S3_BUCKET }} --cache-control "max-age=0, no-cache"
